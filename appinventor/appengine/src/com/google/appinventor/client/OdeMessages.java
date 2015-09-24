@@ -5432,7 +5432,7 @@ public interface OdeMessages extends Messages {
   @Description("")
   String SwitchToSimplifiedChinese();
 
-  @DefaultMessage("繁体中文")
+  @DefaultMessage("�?体中文")
   @Description("")
   String SwitchToTraditionalChinese();
 
@@ -5448,7 +5448,7 @@ public interface OdeMessages extends Messages {
   @Description("")
   String SwitchToItalian();
 
-  @DefaultMessage("Pусский")
+  @DefaultMessage("Pу�?�?кий")
   @Description("")
   String SwitchToRussian();
 
@@ -5568,5 +5568,9 @@ public interface OdeMessages extends Messages {
   @DefaultMessage("PostMedia")
   @Description("")
   String PostMediaMethods();
+  
+  @DefaultMessage("Foo")
+  @Description("This the name of the wonderful Foo property")
+  String PropiedadProperties();
 
 }

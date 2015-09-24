@@ -473,6 +473,13 @@ public interface Images extends Resources {
   @Source("com/google/appinventor/images/procedures.png")
   ImageResource procedures();
   /**
+    * Designer palette item: micomponente
+    */
+  @Source("com/google/appinventor/images/micomponente.png")
+  ImageResource micomponente();
+
+
+  /**
     * Designer palette item: MediaStore
     */
   @Source("com/google/appinventor/images/mediastore.png")
