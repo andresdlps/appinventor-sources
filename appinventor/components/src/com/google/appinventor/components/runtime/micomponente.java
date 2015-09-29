@@ -5,6 +5,12 @@
 
 package com.google.appinventor.components.runtime;
 
+import android.content.Context;
+import android.graphics.drawable.Drawable;
+import android.util.Log;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 import com.google.appinventor.components.annotations.DesignerComponent;
 import com.google.appinventor.components.annotations.DesignerProperty;
 import com.google.appinventor.components.annotations.PropertyCategory;
@@ -13,12 +19,13 @@ import com.google.appinventor.components.annotations.SimpleProperty;
 import com.google.appinventor.components.common.ComponentCategory;
 import com.google.appinventor.components.common.PropertyTypeConstants;
 import com.google.appinventor.components.common.YaVersion;
-import com.google.appinventor.components.runtime.errors.YailRuntimeError;
+import com.google.appinventor.components.runtime.util.AnimationUtil;
+import com.google.appinventor.components.runtime.util.MediaUtil;
 import com.google.appinventor.components.runtime.util.TextViewUtil;
+import com.google.appinventor.components.runtime.util.ViewUtil;
+import java.io.IOException;
 
 
-import android.view.View;
-import android.widget.TextView;
 
 
 @DesignerComponent(version = YaVersion.MICOMPONENTE_COMPONENT_VERSION,
@@ -30,21 +37,21 @@ import android.widget.TextView;
 public final class micomponente extends AndroidViewComponent {
 
   // change to reflect the view of the component
-  private final TextView view;
+  private final TextView nombreProducto;
   
-  int propiedad;
+  private final ImageView view;
+  
+  private String picturePath = ""; 
 
-   @SimpleProperty(category = PropertyCategory.APPEARANCE, userVisible = false)
-    public int Propiedad() {
-        return propiedad;
+   /*@SimpleProperty(category = PropertyCategory.APPEARANCE, userVisible = false)
+    public Image ImagenProducto() {
+        return imagenProducto;
     }
     
     @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_INTEGER, defaultValue = "0")
-    public void Propiedad(int propiedad) {
-        this.propiedad = propiedad;
-    }
-
-  
+    public void ImagenProducto(Image imagenProducto) {
+        this.imagenProducto = imagenProducto;
+    }*/  
   
   
   /**
@@ -54,13 +61,31 @@ public final class micomponente extends AndroidViewComponent {
    */
   public micomponente(ComponentContainer container) {
     super(container);
-    view = new TextView(container.$context());
-
+    nombreProducto = new TextView(container.$context());
+    view = new ImageView(container.$context()) {
+      @Override
+      public boolean verifyDrawable(Drawable dr) {
+        super.verifyDrawable(dr);
+        // TODO(user): multi-image animation
+        return true;
+      }
+    };
+      /*imagenProducto = new ImageView(container.$context()) {
+      @Override
+        public boolean verifyDrawable(Drawable dr) {
+          super.verifyDrawable(dr);
+          // TODO(user): multi-image animation
+          return true;
+        }
+      };*/
     // Adds the component to its designated container
     container.$add(this);
-
+    view.setFocusable(true);
     // Default property values
-    TextViewUtil.setText(view, "your new micomponente");
+    /*TextViewUtil.setText(nombreProducto, "NOMBRE DEL PRODUCTO");
+    TextViewUtil.setFontSize(nombreProducto, (float) 20.0);
+    TextViewUtil.setFontTypeface(nombreProducto, TYPEFACE_DEFAULT, true, false);*/
+    
   }
 
   @Override
@@ -68,4 +93,66 @@ public final class micomponente extends AndroidViewComponent {
     return view;
   }
 
+  /**
+   * Returns the path of the image's picture.
+   *
+   * @return  the path of the image's picture
+   */
+  @SimpleProperty(
+      category = PropertyCategory.APPEARANCE)
+  public String Picture() {
+    return picturePath;
+  }
+
+  /**
+   * Specifies the path of the image's picture.
+   *
+   * <p/>See {@link MediaUtil#determineMediaSource} for information about what
+   * a path can be.
+   *
+   * @param path  the path of the image's picture
+   */
+  @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_ASSET,
+      defaultValue = "")
+  @SimpleProperty
+  public void Picture(String path) {
+    picturePath = (path == null) ? "" : path;
+
+    Drawable drawable;
+    try {
+      drawable = MediaUtil.getBitmapDrawable(container.$form(), picturePath);
+    } catch (IOException ioe) {
+      Log.e("Image", "Unable to load " + picturePath);
+      drawable = null;
+    }
+
+    ViewUtil.setImage(view, drawable);
+  }
+
+  @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
+      defaultValue = "False")
+  @SimpleProperty
+  public void ScalePictureToFit(boolean scale) {
+    if (scale)
+      view.setScaleType(ImageView.ScaleType.FIT_XY);
+  }
+
+  /**
+   * Animation property setter method.
+   *
+   * @see AnimationUtil
+   *
+   * @param animation  animation kind
+   */
+  @SimpleProperty(description = "This is a limited form of animation that can attach " +
+      "a small number of motion types to images.  The allowable motions are " +
+      "ScrollRightSlow, ScrollRight, ScrollRightFast, ScrollLeftSlow, ScrollLeft, " +
+      "ScrollLeftFast, and Stop",
+      category = PropertyCategory.APPEARANCE)
+  // TODO(user): This should be changed from a property to an "animate" method, and have the choices
+  // placed in a dropdown.  Aternatively the whole thing should be removed and we should do
+  // something that is more consistent with sprites.
+  public void Animation(String animation) {
+    AnimationUtil.ApplyAnimation(view, animation);
+  }
 }

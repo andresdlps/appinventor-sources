@@ -39,7 +39,7 @@
   </condition>
 
   <target name="all"
-          depends="AiServerLib,AiClientLib,AiRebindLib,YaClientApp,Keystore,WarLibs">
+         depends="AiServerLib,AiClientLib,AiRebindLib,YaClientApp,Keystore,WarLibs">
   </target>
 
   <target name="tests"

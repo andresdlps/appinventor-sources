@@ -16,9 +16,9 @@
     <ant inheritAll="false" useNativeBasedir="true" dir="appengine"/>
     <ant inheritAll="false" useNativeBasedir="true" dir="blocklyeditor"/>
     <ant inheritAll="false" useNativeBasedir="true" dir="common"/>
-    <ant inheritAll="false" useNativeBasedir="true" dir="buildserver"/>
+    <!--<ant inheritAll="false" useNativeBasedir="true" dir="buildserver"/>-->
     <ant inheritAll="false" useNativeBasedir="true" dir="components"/>
-    <ant inheritAll="false" useNativeBasedir="true" dir="buildserver" target="PlayApp"/>
+    <!--<ant inheritAll="false" useNativeBasedir="true" dir="buildserver" target="PlayApp"/>-->
   </target>
 
   <target name="comps">
@@ -153,7 +153,7 @@
     <ant inheritAll="false" useNativeBasedir="true" dir="appengine" target="clean"/>
     <ant inheritAll="false" useNativeBasedir="true" dir="blocklyeditor" target="clean"/>
     <ant inheritAll="false" useNativeBasedir="true" dir="aimerger" target="clean"/>
-    <ant inheritAll="false" useNativeBasedir="true" dir="buildserver" target="clean"/>
+    <!--<ant inheritAll="false" useNativeBasedir="true" dir="buildserver" target="clean"/>-->
     <ant inheritAll="false" useNativeBasedir="true" dir="common" target="clean"/>
     <ant inheritAll="false" useNativeBasedir="true" dir="components" target="clean"/>
     <delete dir="build"/>

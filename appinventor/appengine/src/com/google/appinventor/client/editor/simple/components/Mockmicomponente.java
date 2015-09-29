@@ -5,15 +5,18 @@
 
 package com.google.appinventor.client.editor.simple.components;
 
-import static com.google.appinventor.client.Ode.MESSAGES;
-
 import com.google.appinventor.client.editor.simple.SimpleEditor;
-import com.google.gwt.i18n.client.Constants;
-import com.google.gwt.i18n.client.Messages;
-import com.google.gwt.i18n.client.Messages.DefaultMessage;
-import com.google.gwt.user.client.DOM;
+import com.google.appinventor.client.output.OdeLog;
+import com.google.gwt.event.dom.client.ErrorEvent;
+import com.google.gwt.event.dom.client.ErrorHandler;
+import com.google.gwt.event.dom.client.LoadEvent;
+import com.google.gwt.event.dom.client.LoadHandler;
+import com.google.gwt.user.client.ui.ComplexPanel;
+import com.google.gwt.user.client.ui.FormPanel;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.InlineLabel;
-import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.user.client.ui.SimplePanel;
+import com.google.gwt.user.client.ui.VerticalPanel;
 
 /**
  * micomponente component.
@@ -26,8 +29,9 @@ public final class Mockmicomponente extends MockVisibleComponent{
  * Component type name.
  */
 public static final String TYPE = "micomponente";
-private static final int DEFAULT_WIDTH = 100;
-
+private static final int DEFAULT_WIDTH = LENGTH_FILL_PARENT;
+private static final String PROPERTY_NAME_PICTURE = "Picture";
+  private static final String PROPERTY_SCALE_PICTURE_TO_FIT = "ScalePictureToFit";
 
 /**
  * Creates a new Mockmicomponente component.
@@ -37,9 +41,10 @@ private static final int DEFAULT_WIDTH = 100;
 
 //Widget for showing the mock component
  private InlineLabel labelWidget;
-
-
-
+ private final Image image;
+ private String picturePropValue;
+ private boolean fitToScale;
+ 
  /**
   * Creates a new Mockmicomponente component.
   *
@@ -50,10 +55,34 @@ private static final int DEFAULT_WIDTH = 100;
 
    // Initialize mock label UI
    labelWidget = new InlineLabel();
+   labelWidget.setText("Label prueba");
    labelWidget.setStylePrimaryName("ode-SimpleMockComponent");
-   labelWidget.setText("your new micomponente");
-   initComponent(labelWidget);
-   refreshForm();
+//   initComponent(labelWidget);
+   
+   
+    image = new Image();
+       image.addErrorHandler(new ErrorHandler() {
+         @Override
+         public void onError(ErrorEvent event) {
+           if (picturePropValue != null && !picturePropValue.isEmpty()) {
+             OdeLog.elog("Error occurred while loading image " + picturePropValue);
+           }
+           refreshForm();
+         }
+       });
+       image.addLoadHandler(new LoadHandler() {
+         @Override
+         public void onLoad(LoadEvent event) {
+           refreshForm();
+         }
+       });
+       VerticalPanel panel = new VerticalPanel();
+       panel.setStylePrimaryName("ode-SimpleMockComponent");
+       panel.addStyleName("imageComponentCenterPanel");
+       panel.add(labelWidget);
+       panel.add(image);
+       initComponent(panel);
+//    refreshForm();
  }
 
 
@@ -67,16 +96,88 @@ private static final int DEFAULT_WIDTH = 100;
    return super.isPropertyVisible(propertyName);
  }
 
- @Override
- public int getPreferredWidth() {
-   // The superclass uses getOffsetWidth, which won't work for us.
-   return DEFAULT_WIDTH;
- }
+// @Override
+// public int getPreferredWidth() {
+//   // The superclass uses getOffsetWidth, which won't work for us.
+//   return DEFAULT_WIDTH;
+// }°
+ 
+ /*
+   * Sets the image's url to a new value.
+   */
+  private void setPictureProperty(String text) {
+    picturePropValue = text;
+    String url = convertImagePropertyValueToUrl(text);
+    if (url == null) {
+      // text was not recognized as an asset. Just display the icon for this type of component.
+      Image iconImage = getIconImage();
+      image.setUrlAndVisibleRect(iconImage.getUrl(),
+          iconImage.getOriginLeft(), iconImage.getOriginTop(),
+          iconImage.getWidth(), iconImage.getHeight());
+    } else {
+      image.setUrl(url);
+    }
+  }
+
+  @Override
+  public int getPreferredWidth() {
+    // The superclass uses getOffsetWidth, which won't work for us.
+    // Hide away the current 100% size so we can get at the actual size, otherwise automatic size doesn't work
+    String[] style = MockComponentsUtil.clearSizeStyle(image);
+    int width = image.getWidth() + labelWidget.getOffsetWidth();
+    MockComponentsUtil.restoreSizeStyle(image, style);
+    return width;
+  }
+
+  @Override
+  public int getPreferredHeight() {
+    // The superclass uses getOffsetHeight, which won't work for us.
+    // Hide away the current 100% size so we can get at the actual size, otherwise automatic size doesn't work
+    String[] style = MockComponentsUtil.clearSizeStyle(image);
+    int height = image.getHeight() + labelWidget.getOffsetHeight();
+    MockComponentsUtil.restoreSizeStyle(image, style);
+    return height;
+  }
+
+  /**
+   * property to make the picture scale to fit its parents width and height
+   * @param newValue true will scale the picture
+   */
+  private void setScalingProperty(String newValue) {
+    if (newValue.equals("True")){
+      fitToScale = true;
+      image.setSize("100%", "100%");
+    }
+
+    else {
+      fitToScale = false;
+      image.setSize(getPreferredWidth() + "px", getPreferredHeight() + "px");
+    }
+  }
 
  // PropertyChangeListener implementation
  @Override
  public void onPropertyChange(String propertyName, String newValue) {
    super.onPropertyChange(propertyName, newValue);
+   
+   // Apply changed properties to the mock component
+    if (propertyName.equals(PROPERTY_NAME_PICTURE)) {
+      setPictureProperty(newValue);
+      refreshForm();
+    }
+    else if (propertyName.equals(PROPERTY_SCALE_PICTURE_TO_FIT)) {
+      setScalingProperty(newValue);
+      refreshForm();
 
+    }
+    else if (propertyName.equals(PROPERTY_NAME_WIDTH)) {
+      image.setWidth(newValue + "px");
+      refreshForm();
+
+    }
+    else if (propertyName.equals(PROPERTY_NAME_HEIGHT)) {
+      image.setHeight(newValue + "px");
+      refreshForm();
+    }
  }
 }
